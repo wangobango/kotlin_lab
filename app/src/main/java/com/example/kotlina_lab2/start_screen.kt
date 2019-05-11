@@ -10,6 +10,11 @@ class start_screen : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        try {
+            this.supportActionBar!!.hide()
+        } catch (e: NullPointerException) {
+        }
+
         setContentView(R.layout.activity_start_screen)
         Timer().schedule(3000){
             startActivity(Intent(this@start_screen,MainActivity::class.java))

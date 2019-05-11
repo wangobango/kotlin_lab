@@ -1,10 +1,13 @@
 package com.example.kotlina_lab2
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.doAsync
+import java.net.URL
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
@@ -39,7 +42,6 @@ class MainActivity : AppCompatActivity() {
             editor.putInt("recordValue",record)
             editor.apply()
         }
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,12 +62,20 @@ class MainActivity : AppCompatActivity() {
                 textView2.text = "Brawo ziom"
                 dialogShow()
                 steps = 0
+                doAsync {
+                    URL("http://hufiecgniezno.pl/br/record.php?f=add&id=132213&r="+record.toString())
+                }
             } else if (liczba > chance){
                 textView2.text = "Za dużo ! Mniej! W "+steps.toString()+" krokach"
             } else if (liczba < chance){
                 textView2.text = "Za mało ! Wincyj! W "+steps.toString()+" krokach"
             }
 
+        }
+
+        button3.setOnClickListener{
+            val intent = Intent(this, ranking::class.java)
+            startActivity(intent)
         }
 
 
