@@ -1,5 +1,6 @@
 package com.example.kotlina_lab2
 
+import android.accounts.NetworkErrorException
 import android.app.DownloadManager
 import android.os.AsyncTask
 import android.os.Bundle
@@ -31,11 +32,11 @@ import javax.security.auth.callback.Callback
 import kotlin.concurrent.schedule
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.lang.Exception
+import java.net.ConnectException
 import java.net.HttpURLConnection
 
 class ranking : AppCompatActivity() {
-    private val ADD_TASK_REQUEST = 1
-    private val recordList: MutableList<String> = mutableListOf()
     lateinit var progress: ProgressBar
     private lateinit var listView: ListView
 
@@ -51,20 +52,24 @@ class ranking : AppCompatActivity() {
 
 
     fun loadData(): String{
-        return URL("http://hufiecgniezno.pl/br/record.php?f=get").readText()
+        try {
+            return URL("http://hufiecgniezno.pl/br/record.php?f=get").readText()
+        } catch (ex: Exception){
+            return readRecordListFromCache()
+        }
     }
 
-    fun setRecordList(list: Set<String>){
+    fun setRecordList(list: String){
         val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
         val editor = loginShared!!.edit()
-        editor.putStringSet("recordList",list)
+        editor.putString("recordList",list)
         editor.apply()
     }
 
 
-    fun readRecordListFromCache():MutableSet<String>?{
+    fun readRecordListFromCache():String{
         val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
-        return loginShared.getStringSet("recordList",null)
+        return loginShared.getString("recordList","").orEmpty()
     }
 
 
@@ -73,31 +78,20 @@ class ranking : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.ranking)
         progress = findViewById(R.id.progressBar)
-
         listView = findViewById<ListView>(R.id.listView)
-        //download records from server TODO
-
         val listItems = arrayOfNulls<String>(10)
-//        progress = findViewById(R.id.progressBar)
-//        progress.visibility = View.VISIBLE
-//        Timer().schedule(3000){
-//            progress.visibility = View.INVISIBLE
-//        }
-
-//        doAsync {
-//            val data = loadData()
-//            uiThread {
-//                for(i in 0..10){
-//                    listItems[i] = data
-//                }
-//                val adapter = ArrayAdapter(this@ranking ,android.R.layout.simple_list_item_1, listItems)
-//                this@ranking.listView.adapter = adapter
-//            }
-//        }
-
-
-
+        doAsync {
+            var data = loadData()
+            var pom = data.replace("[[","").replace("]]","").split("],[")
+            uiThread {
+                setRecordList(data)
+                for(i in 0..pom.size-1){
+                    var msg = pom[i].replace("\"","").split(",")
+                    listItems[i] = "Gracz: "+msg[1]+", z rekordem: "+msg[2]
+                }
+                val adapter = ArrayAdapter(this@ranking ,android.R.layout.simple_list_item_1, listItems)
+                this@ranking.listView.adapter = adapter
+            }
+        }
     }
-
-
 }

@@ -15,17 +15,33 @@ class MainActivity : AppCompatActivity() {
     var record = 0
     var chance = 0
     var steps = 0
+    var score = 0
+    var newGameFlag = 0
+
+    fun getScoreValue(steps: Int):Int {
+        if (steps == 1) {
+            return 5
+        } else if (steps >= 2 && steps <= 4) {
+            return 3
+        } else if (steps >= 5 && steps <= 6) {
+            return 2
+        } else if (steps >= 7 && steps <= 10) {
+            return 1
+        } else {
+            return 0
+        }
+    }
 
     fun getRecord(){
         val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
-        record = loginShared.getInt("recordValue",0)
+        record = loginShared.getInt("recordValue",21)
     }
 
     fun dialogShow(){
         val builder = AlertDialog.Builder(this@MainActivity)
 
         builder.setTitle("Wygrałeś!")
-        builder.setMessage("Udało ci się za "+chance.toString()+" podejściem")
+        builder.setMessage("Udało ci się za "+steps.toString()+" podejściem")
 
         builder.setPositiveButton("Super") { dialog, which ->
             Toast.makeText(applicationContext, "Wyslosowałeś nową liczbę", Toast.LENGTH_SHORT).show()
@@ -35,11 +51,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setRecord(){
-        if(record>chance){
-            record = chance
+        if(record>steps){
+            record = steps
             val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
             val editor = loginShared!!.edit()
             editor.putInt("recordValue",record)
+            editor.apply()
+        }
+    }
+
+    fun getMaxScore():Int{
+        val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
+        return loginShared.getInt("scoreValue",0)
+    }
+
+    fun setMaxScore(score:Int){
+        if(score>getMaxScore()){
+            val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
+            val editor = loginShared!!.edit()
+            editor.putInt("scoreValue",score)
             editor.apply()
         }
     }
@@ -49,28 +79,37 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         button2.setOnClickListener{
+            newGameFlag = 1
             getRecord()
             chance = Random.nextInt(0,20)
             textView.text = "Rekord wynosi: "+record.toString()
+            textView4.text = "Wynik wynosi: "+getMaxScore().toString()
         }
 
         button.setOnClickListener{
-            steps += 1
-            val liczba = editText.text.toString().toInt()
-            if(liczba == chance){
-                setRecord()
-                textView2.text = "Brawo ziom"
-                dialogShow()
-                steps = 0
-                doAsync {
-                    URL("http://hufiecgniezno.pl/br/record.php?f=add&id=132213&r="+record.toString())
+            if(newGameFlag>0){
+                steps += 1
+                val liczba = editText.text.toString().toInt()
+                if(liczba == chance){
+                    setRecord()
+                    setMaxScore(getScoreValue(steps))
+                    textView4.text = "Wynik wynosi: "+getMaxScore().toString()
+                    textView2.text = "Brawo ziom"
+                    dialogShow()
+                    steps = 0
+                    score = 0
+                    newGameFlag = 0
+                    doAsync {
+                        URL("http://hufiecgniezno.pl/br/record.php?f=add&id=132213&r="+getMaxScore().toString())
+                    }
+                } else if (liczba > chance){
+                    textView2.text = "Za dużo ! Mniej! W "+steps.toString()+" krokach"
+                } else if (liczba < chance){
+                    textView2.text = "Za mało ! Wincyj! W "+steps.toString()+" krokach"
                 }
-            } else if (liczba > chance){
-                textView2.text = "Za dużo ! Mniej! W "+steps.toString()+" krokach"
-            } else if (liczba < chance){
-                textView2.text = "Za mało ! Wincyj! W "+steps.toString()+" krokach"
+            } else {
+                Toast.makeText(applicationContext, "Musisz najpierw rozpocząć nową grę!", Toast.LENGTH_SHORT).show()
             }
-
         }
 
         button3.setOnClickListener{
