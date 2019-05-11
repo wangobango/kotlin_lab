@@ -7,6 +7,9 @@
         android:layout_height="match_parent"
         tools:context=".MainActivity">
 
+    <android.support.design.widget.NavigationView
+            android:layout_width="395dp"
+            android:layout_height="408dp" tools:layout_editor_absoluteY="315dp" tools:layout_editor_absoluteX="8dp"/>
     <LinearLayout
             android:orientation="vertical"
             android:layout_width="412dp"
@@ -15,7 +18,7 @@
                 android:text="Traf Liczbę"
                 android:layout_width="match_parent"
                 android:layout_height="43dp" android:id="@+id/textView2" android:textAlignment="gravity"
-                android:gravity="center"/>
+                android:gravity="center" android:foregroundGravity="center"/>
         <EditText
                 android:layout_width="match_parent"
                 android:layout_height="57dp"
