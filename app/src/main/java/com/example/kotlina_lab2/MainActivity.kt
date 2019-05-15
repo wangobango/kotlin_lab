@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity() {
                     score = 0
                     newGameFlag = 0
                     doAsync {
-                        val a = URL("http://hufiecgniezno.pl/br/record.php?f=add&id=132213&r="+getMaxScore().toString())
+                        URL("http://hufiecgniezno.pl/br/record.php?f=add&id=132213&r="+getMaxScore().toString())
                     }
                 } else if (liczba > chance){
                     textView2.text = "Za dużo ! Mniej! W "+steps.toString()+" krokach"
