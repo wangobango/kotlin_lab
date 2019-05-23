@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.widget.Toast
+import com.example.kotlina_lab2.DB.DatabaseHelper
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import java.net.URL
@@ -74,9 +75,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun removeCurrentUser(){
+        val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
+        val editor = loginShared!!.edit()
+        editor.putString("currentLogin","")
+        editor.putString("currentPassword", "")
+        editor.apply()
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val dbHelper = DatabaseHelper(this)
 
         button2.setOnClickListener{
             newGameFlag = 1
@@ -115,6 +127,11 @@ class MainActivity : AppCompatActivity() {
         button3.setOnClickListener{
             val intent = Intent(this, ranking::class.java)
             startActivity(intent)
+        }
+
+        button5.setOnClickListener {
+            removeCurrentUser()
+            startActivity(Intent(this@MainActivity,LoginActivity::class.java))
         }
 
 

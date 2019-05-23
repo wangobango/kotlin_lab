@@ -1,5 +1,5 @@
 
-package com.jk.developers.firstkotlinapp
+package com.example.kotlina_lab2.DB
 
 import java.io.File
 import java.io.FileOutputStream
@@ -39,7 +39,8 @@ class DatabaseHelper(private val myContext: Context) : SQLiteOpenHelper(myContex
             this.readableDatabase
             try {
                 this.close()
-                copyDataBase()
+//                copyDataBase()
+//                onCreate(myDataBase!!)
             } catch (e: IOException) {
                 throw Error("Error copying database")
             }
@@ -116,7 +117,7 @@ class DatabaseHelper(private val myContext: Context) : SQLiteOpenHelper(myContex
 
     override fun onCreate(db: SQLiteDatabase) {
         db.createTable("Users", true,
-            "id" to INTEGER + PRIMARY_KEY + UNIQUE + AUTOINCREMENT,
+            "id" to INTEGER + PRIMARY_KEY + UNIQUE ,
             "name" to TEXT,
             "password" to TEXT)
         // TODO Auto-generated method stub
@@ -148,7 +149,7 @@ class DatabaseHelper(private val myContext: Context) : SQLiteOpenHelper(myContex
     companion object {
         val DATABASE_NAME = "first.db"// "db.sqlite";
         @SuppressLint("SdCardPath")
-        val DATABASE_PATH = "/data/data/com.jk.developers.firstkotlinapp/databases/"
+        val DATABASE_PATH = "/data/data/com.example.kotlina_lab2/databases/"
         val DATABASE_VERSION = 1
         val TABLE_ACCOUNTS = "Users"
         val TAG = "Error-->>class_dbhelper"

@@ -79,7 +79,7 @@ class ranking : AppCompatActivity() {
         setContentView(R.layout.ranking)
         progress = findViewById(R.id.progressBar)
         listView = findViewById<ListView>(R.id.listView)
-        val listItems = arrayOfNulls<String>(10)
+        val listItems = arrayOfNulls<String>(1000)
         doAsync {
             var data = loadData()
             var pom = data.replace("[[","").replace("]]","").split("],[")

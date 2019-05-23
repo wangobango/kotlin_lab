@@ -7,13 +7,15 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import com.jk.developers.firstkotlinapp.DatabaseHelper
+import com.example.kotlina_lab2.DB.DatabaseHelper
 
 class LoginActivity : AppCompatActivity() {
     var _usernameText: EditText? = null
     var _passwordText: EditText? = null
     var _loginButton: Button? = null
     var _signupLink: TextView? = null
+    var currentLogin: String = ""
+    var currentPassword: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +25,9 @@ class LoginActivity : AppCompatActivity() {
         _signupLink = findViewById(R.id.signup) as TextView
         _passwordText = findViewById(R.id.password) as EditText
         _usernameText = findViewById(R.id.username) as EditText
-        _loginButton!!.setOnClickListener { login() }
+        _loginButton!!.setOnClickListener {
+            login()
+        }
 
         _signupLink!!.setOnClickListener {
             // Start the Signup activity
@@ -32,6 +36,25 @@ class LoginActivity : AppCompatActivity() {
             finish()
         }
 
+        getCurrentUserIfExists()
+        if(currentLogin != ""){
+            startActivity(Intent(this@LoginActivity,MainActivity::class.java))
+        }
+
+    }
+
+    fun saveCurrentUser(login: String, pass:String){
+        val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
+        val editor = loginShared!!.edit()
+        editor.putString("currentLogin",login)
+        editor.putString("currentPassword", pass)
+        editor.apply()
+    }
+
+    fun getCurrentUserIfExists(){
+        val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
+        currentLogin = loginShared.getString("currentLogin","")!!
+        currentPassword = loginShared.getString("currentPassword","")!!
     }
 
     fun login(){
@@ -39,10 +62,12 @@ class LoginActivity : AppCompatActivity() {
         helper.createDataBase()
         helper.openDatabase()
         if(helper.userLogin(_usernameText!!.text.toString(),_passwordText!!.text.toString())) {
+            saveCurrentUser(_usernameText!!.text.toString(),_passwordText!!.text.toString())
             startActivity(Intent(this@LoginActivity,MainActivity::class.java))
         } else {
             Toast.makeText(applicationContext, "User with given login/password doesn't exist !!!", Toast.LENGTH_SHORT).show()
         }
+        helper.closeDataBase()
     }
 
     fun validate(): Boolean {

@@ -2,7 +2,7 @@ package com.example.kotlina_lab2
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import com.jk.developers.firstkotlinapp.DatabaseHelper
+import com.example.kotlina_lab2.DB.DatabaseHelper
 import kotlinx.android.synthetic.main.activity_register.*
 
 
