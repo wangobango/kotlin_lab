@@ -17,7 +17,7 @@ class start_screen : AppCompatActivity() {
 
         setContentView(R.layout.activity_start_screen)
         Timer().schedule(3000){
-            startActivity(Intent(this@start_screen,MainActivity::class.java))
+            startActivity(Intent(this@start_screen,LoginActivity::class.java))
         }
     }
 }
