@@ -18,6 +18,9 @@ class MainActivity : AppCompatActivity() {
     var steps = 0
     var score = 0
     var newGameFlag = 0
+    var currentLogin = ""
+    var currentPassword = ""
+    val dbHelper = DatabaseHelper(this)
 
     fun getScoreValue(steps: Int):Int {
         if (steps == 1) {
@@ -54,6 +57,7 @@ class MainActivity : AppCompatActivity() {
     fun setRecord(){
         if(record>steps){
             record = steps
+            dbHelper.updateUserScore(currentLogin,currentPassword,record.toString())
             val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
             val editor = loginShared!!.edit()
             editor.putInt("recordValue",record)
@@ -83,12 +87,17 @@ class MainActivity : AppCompatActivity() {
         editor.apply()
     }
 
+    fun getCurrentUserIfExists(){
+        val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
+        currentLogin = loginShared.getString("currentLogin","")!!
+        currentPassword = loginShared.getString("currentPassword","")!!
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val dbHelper = DatabaseHelper(this)
 
         button2.setOnClickListener{
             newGameFlag = 1
@@ -112,7 +121,7 @@ class MainActivity : AppCompatActivity() {
                     score = 0
                     newGameFlag = 0
                     doAsync {
-                        URL("http://hufiecgniezno.pl/br/record.php?f=add&id=132213&r="+getMaxScore().toString()).readText()
+                        URL("http://hufiecgniezno.pl/br/record.php?f=add&id="+currentLogin+"&r="+dbHelper.getUserScore(currentLogin,currentPassword))
                     }
                 } else if (liczba > chance){
                     textView2.text = "Za dużo ! Mniej! W "+steps.toString()+" krokach"

@@ -119,14 +119,15 @@ class DatabaseHelper(private val myContext: Context) : SQLiteOpenHelper(myContex
         db.createTable("Users", true,
             "id" to INTEGER + PRIMARY_KEY + UNIQUE ,
             "name" to TEXT,
-            "password" to TEXT)
+            "password" to TEXT,
+            "score" to TEXT)
         // TODO Auto-generated method stub
 
     }
 
     fun userSignup(email: String, password: String): Boolean
     {
-        var add = "insert into ${TABLE_ACCOUNTS} (name,password) values('"+email+"','"+password+"')"
+        var add = "insert into ${TABLE_ACCOUNTS} (name,password,score) values('"+email+"','"+password+"','"+0+"')"
         try {
             myDataBase!!.execSQL(add)
             return true
@@ -144,6 +145,29 @@ class DatabaseHelper(private val myContext: Context) : SQLiteOpenHelper(myContex
         var ret = "select * from ${TABLE_ACCOUNTS} where name = '"+email+"' AND password = '"+password+"'"
         var cursor: Cursor = myDataBase!!.rawQuery(ret, null)
         return cursor.count == 1
+    }
+
+    fun getUserScore(email: String, password: String): String {
+        var ret = "select score from ${TABLE_ACCOUNTS} where name = '"+email+"' AND password = '"+password+"'"
+        var cursor: Cursor = myDataBase!!.rawQuery(ret, null)
+        cursor.moveToFirst()
+        var res =  cursor.getString(0)
+        cursor.close()
+        return res
+    }
+
+    fun updateUserScore(email: String, password: String, score: String): Boolean {
+        var up = "UPDATE ${TABLE_ACCOUNTS} SET score = '"+score+"' where name = '"+email+"' AND password = '"+password+"'"
+        try {
+            myDataBase!!.execSQL(up)
+            return true
+        }
+        catch (e: Exception)
+        {
+            Log.e(TAG, "Error = "+e.toString())
+            return false
+        }
+
     }
 
     companion object {
