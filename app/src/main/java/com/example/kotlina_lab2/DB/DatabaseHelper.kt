@@ -121,7 +121,6 @@ class DatabaseHelper(private val myContext: Context) : SQLiteOpenHelper(myContex
             "name" to TEXT,
             "password" to TEXT,
             "score" to TEXT)
-        // TODO Auto-generated method stub
 
     }
 
