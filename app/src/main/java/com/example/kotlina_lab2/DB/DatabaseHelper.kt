@@ -33,14 +33,14 @@ class DatabaseHelper(private val myContext: Context) : SQLiteOpenHelper(myContex
 
         if (dbExist) {
             Log.v("DB Exists", "db exists")
-
         } else {
 
             this.readableDatabase
             try {
                 this.close()
+//                this.copyDataBase()
 //                copyDataBase()
-//                onCreate(myDataBase!!)
+//                copyDataBase()
             } catch (e: IOException) {
                 throw Error("Error copying database")
             }
@@ -121,29 +121,35 @@ class DatabaseHelper(private val myContext: Context) : SQLiteOpenHelper(myContex
             "name" to TEXT,
             "password" to TEXT,
             "score" to TEXT)
-
     }
 
     fun userSignup(email: String, password: String): Boolean
     {
-        var add = "insert into ${TABLE_ACCOUNTS} (name,password,score) values('"+email+"','"+password+"','"+0+"')"
-        try {
-            myDataBase!!.execSQL(add)
-            return true
+        if(!userLogin(email,password)) {
+            var add = "insert into ${TABLE_ACCOUNTS} (name,password,score) values('"+email+"','"+password+"','"+0+"')"
+            try {
+                myDataBase!!.execSQL(add)
+                return true
+            }
+            catch (e: Exception)
+            {
+                Log.e(TAG, "Error = "+e.toString())
+                return false
+            }
         }
-        catch (e: Exception)
-        {
-            Log.e(TAG, "Error = "+e.toString())
-            return false
-        }
-
+        return false
     }
 
     fun userLogin(email: String , password: String) : Boolean
     {
         var ret = "select * from ${TABLE_ACCOUNTS} where name = '"+email+"' AND password = '"+password+"'"
         var cursor: Cursor = myDataBase!!.rawQuery(ret, null)
-        return cursor.count == 1
+        var result = false
+        if(cursor.count >= 1) {
+            result = true
+        }
+        cursor.close()
+        return result
     }
 
     fun getUserScore(email: String, password: String): String {

@@ -16,10 +16,14 @@ class LoginActivity : AppCompatActivity() {
     var _signupLink: TextView? = null
     var currentLogin: String = ""
     var currentPassword: String = ""
+    val helper = DatabaseHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        helper.createDataBase()
+        helper.openDatabase()
 
         _loginButton = findViewById(R.id.signin) as Button
         _signupLink = findViewById(R.id.signup) as TextView
@@ -58,9 +62,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     fun login(){
-        val helper = DatabaseHelper(this)
-        helper.createDataBase()
-        helper.openDatabase()
         if(helper.userLogin(_usernameText!!.text.toString(),_passwordText!!.text.toString())) {
             saveCurrentUser(_usernameText!!.text.toString(),_passwordText!!.text.toString())
             startActivity(Intent(this@LoginActivity,MainActivity::class.java))
