@@ -8,6 +8,17 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import com.example.kotlina_lab2.DB.DatabaseHelper
+import com.example.kotlina_lab2.DB.RemoteDBHelper
+import org.jetbrains.anko.doAsync
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.io.OutputStreamWriter
+import java.net.HttpURLConnection
+import java.net.URL
+import java.net.URLEncoder
+import android.os.StrictMode
+import org.jetbrains.anko.uiThread
+
 
 class LoginActivity : AppCompatActivity() {
     var _usernameText: EditText? = null
@@ -17,10 +28,14 @@ class LoginActivity : AppCompatActivity() {
     var currentLogin: String = ""
     var currentPassword: String = ""
     val helper = DatabaseHelper(this)
+    val remoteHelper = RemoteDBHelper(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        val policy = StrictMode.ThreadPolicy.Builder().permitAll().build()
+        StrictMode.setThreadPolicy(policy)
 
         helper.createDataBase()
         helper.openDatabase()
@@ -61,14 +76,22 @@ class LoginActivity : AppCompatActivity() {
         currentPassword = loginShared.getString("currentPassword","")!!
     }
 
+
     fun login(){
-        if(helper.userLogin(_usernameText!!.text.toString(),_passwordText!!.text.toString())) {
-            saveCurrentUser(_usernameText!!.text.toString(),_passwordText!!.text.toString())
-            startActivity(Intent(this@LoginActivity,MainActivity::class.java))
-        } else {
-            Toast.makeText(applicationContext, "User with given login/password doesn't exist !!!", Toast.LENGTH_SHORT).show()
+        doAsync {
+            val id = remoteHelper.login(_usernameText!!.text.toString(), _passwordText!!.text.toString())
+            uiThread {
+                if(id) {
+                    saveCurrentUser(_usernameText!!.text.toString(), _passwordText!!.text.toString())
+                    val intent = Intent(applicationContext, MainActivity::class.java)
+                    startActivityForResult(intent, REQUEST_SIGNUP)
+                    finish()
+                } else {
+                    Toast.makeText(applicationContext, "Błędny login lub hasło!", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
-        helper.closeDataBase()
+
     }
 
     fun validate(): Boolean {
@@ -78,7 +101,7 @@ class LoginActivity : AppCompatActivity() {
         val password = _passwordText!!.text.toString()
 
         if (email.isEmpty()) {
-            _usernameText!!.error = "enter a valid email address"
+            _usernameText!!.error = "enter a valid login"
             valid = false
         } else {
             _usernameText!!.error = null

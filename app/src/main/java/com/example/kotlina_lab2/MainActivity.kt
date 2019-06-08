@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v7.app.AlertDialog
 import android.widget.Toast
 import com.example.kotlina_lab2.DB.DatabaseHelper
+import com.example.kotlina_lab2.DB.RemoteDBHelper
 import kotlinx.android.synthetic.main.activity_main.*
 import org.jetbrains.anko.doAsync
 import java.net.URL
@@ -21,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     var currentLogin = ""
     var currentPassword = ""
     val dbHelper = DatabaseHelper(this)
+    val remoteHelper = RemoteDBHelper(this)
 
     fun getScoreValue(steps: Int):Int {
         if (steps == 1) {
@@ -38,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     fun getRecord(){
         val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
-        record = loginShared.getInt("recordValue",21)
+        record = loginShared.getInt("recordValue",0)
     }
 
     fun dialogShow(){
@@ -55,19 +57,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setRecord(){
-        if(record>steps){
-            record = steps
+        if(score>record){
+            record = score
             dbHelper.updateUserScore(currentLogin,currentPassword,record.toString())
             val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
             val editor = loginShared!!.edit()
+            textView.text = score.toString()
             editor.putInt("recordValue",record)
             editor.apply()
+            Toast.makeText(applicationContext, "It's a new record! God, you're bored!", Toast.LENGTH_SHORT).show()
+            remoteHelper.addNewRecord(getCurrentUser(), score)
         }
     }
 
     fun getMaxScore():Int{
         val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
         return loginShared.getInt("scoreValue",0)
+    }
+
+    fun getCurrentUser(): String{
+        val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
+        val login = loginShared.getString("currentLogin","ramon")!!
+        return login
     }
 
     fun setMaxScore(score:Int){
@@ -98,39 +109,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-
-        button2.setOnClickListener{
-            newGameFlag = 1
-            getRecord()
-            chance = Random.nextInt(0,20)
-            textView.text = "Rekord wynosi: "+record.toString()
-            textView4.text = "Wynik wynosi: "+getMaxScore().toString()
-        }
+        getRecord()
 
         button.setOnClickListener{
-            if(newGameFlag>0){
-                steps += 1
-                val liczba = editText.text.toString().toInt()
-                if(liczba == chance){
-                    setRecord()
-                    setMaxScore(getScoreValue(steps))
-                    textView4.text = "Wynik wynosi: "+getMaxScore().toString()
-                    textView2.text = "Brawo ziom"
-                    dialogShow()
-                    steps = 0
-                    score = 0
-                    newGameFlag = 0
-                    doAsync {
-                        URL("http://hufiecgniezno.pl/br/record.php?f=add&id="+currentLogin+"&r="+dbHelper.getUserScore(currentLogin,currentPassword)).readText()
-                    }
-                } else if (liczba > chance){
-                    textView2.text = "Za dużo ! Mniej! W "+steps.toString()+" krokach"
-                } else if (liczba < chance){
-                    textView2.text = "Za mało ! Wincyj! W "+steps.toString()+" krokach"
-                }
-            } else {
-                Toast.makeText(applicationContext, "Musisz najpierw rozpocząć nową grę!", Toast.LENGTH_SHORT).show()
-            }
+            score+=1
+            setRecord()
+            textView4.text = score.toString()
         }
 
         button3.setOnClickListener{

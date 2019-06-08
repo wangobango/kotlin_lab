@@ -14,7 +14,7 @@
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" android:id="@+id/linearLayout2">
         <TextView
-                android:text="Traf Liczbę"
+                android:text="CLICK ALL YOU LIKE"
                 android:layout_width="match_parent"
                 android:layout_height="43dp" android:id="@+id/textView2" android:textAlignment="gravity"
                 android:gravity="center" android:foregroundGravity="center"/>
@@ -33,19 +33,15 @@
                     android:layout_marginStart="90dp"/>
         </RelativeLayout>
         <Button
-                android:text="STRZELAJ"
+                android:text="CLICK"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/button"/>
         <Button
-                android:text="NOWA GRA"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:id="@+id/button2"/>
-        <Button
-                android:text="Pokaż ranking"
+                android:text="TOP 10"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/button3"/>
         <Button
-                android:text="Wyloguj"
+                android:text="SIGN OUT"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" android:id="@+id/button5"/>
     </LinearLayout>
