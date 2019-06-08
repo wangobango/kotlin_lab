@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setMaxScore(score:Int){
-        if(score>getMaxScore()){
+        if (score>getMaxScore()) {
             val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
             val editor = loginShared!!.edit()
             editor.putInt("scoreValue",score)
@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity() {
                     score = 0
                     newGameFlag = 0
                     doAsync {
-                        URL("http://hufiecgniezno.pl/br/record.php?f=add&id="+currentLogin+"&r="+dbHelper.getUserScore(currentLogin,currentPassword))
+                        URL("http://hufiecgniezno.pl/br/record.php?f=add&id="+currentLogin+"&r="+dbHelper.getUserScore(currentLogin,currentPassword)).readText()
                     }
                 } else if (liczba > chance){
                     textView2.text = "Za dużo ! Mniej! W "+steps.toString()+" krokach"
