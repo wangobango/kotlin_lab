@@ -94,9 +94,19 @@ class RemoteDBHelper(private val myContext: Context) {
         return result == "OK"
     }
 
+    fun getUserRecord(login: String): String {
+        var result = URL(url+ port+"/user/record/"+login).readText()
+        var res = result.split(":")[1].replace("}","").replace("\"","")
+        println(res)
+        return res
+    }
+
+    fun getTopScores(): String {
+        return URL(url+ port+"/top").readText()
+    }
+
     companion object{
         val url = "http://192.168.1.16"
         val port = ":3000"
-
     }
 }

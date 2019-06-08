@@ -17,6 +17,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
 import android.os.StrictMode
+import android.support.v7.app.AlertDialog
 import org.jetbrains.anko.uiThread
 
 
@@ -78,20 +79,36 @@ class LoginActivity : AppCompatActivity() {
 
 
     fun login(){
-        doAsync {
-            val id = remoteHelper.login(_usernameText!!.text.toString(), _passwordText!!.text.toString())
-            uiThread {
-                if(id) {
-                    saveCurrentUser(_usernameText!!.text.toString(), _passwordText!!.text.toString())
-                    val intent = Intent(applicationContext, MainActivity::class.java)
-                    startActivityForResult(intent, REQUEST_SIGNUP)
-                    finish()
-                } else {
-                    Toast.makeText(applicationContext, "Błędny login lub hasło!", Toast.LENGTH_SHORT).show()
+        if(validate()) {
+            doAsync {
+                val id = remoteHelper.login(_usernameText!!.text.toString(), _passwordText!!.text.toString())
+                uiThread {
+                    if(id) {
+                        saveCurrentUser(_usernameText!!.text.toString(), _passwordText!!.text.toString())
+                        val intent = Intent(applicationContext, MainActivity::class.java)
+                        startActivityForResult(intent, REQUEST_SIGNUP)
+                        finish()
+                    } else {
+                        Toast.makeText(applicationContext, "Błędny login lub hasło!", Toast.LENGTH_SHORT).show()
+                        dialogShow()
+                    }
                 }
             }
         }
 
+    }
+
+    fun dialogShow(){
+        val builder = AlertDialog.Builder(this@LoginActivity)
+
+        builder.setTitle("ERROR!")
+        builder.setMessage("Wrong username or password!")
+
+        builder.setPositiveButton("That's too bad :C") { dialog, which ->
+            Toast.makeText(applicationContext, "You can always try again ;)", Toast.LENGTH_SHORT).show()
+        }
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
     }
 
     fun validate(): Boolean {

@@ -38,23 +38,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun dialogShow(){
+        val builder = AlertDialog.Builder(this@MainActivity)
+
+        builder.setTitle("Lazy award....!")
+        builder.setMessage("Congrats or something.... You just clicked a button 100 times because some stupid box told you too.....")
+
+        builder.setPositiveButton("You're so smart ...") { dialog, which ->
+            Toast.makeText(applicationContext, "Come again or something...", Toast.LENGTH_SHORT).show()
+        }
+        val dialog: AlertDialog = builder.create()
+        dialog.show()
+    }
+
     fun getRecord(){
         val loginShared = this.getSharedPreferences("com.example.kotlina_lab2.prefs",0)
         record = loginShared.getInt("recordValue",0)
     }
 
-    fun dialogShow(){
-        val builder = AlertDialog.Builder(this@MainActivity)
-
-        builder.setTitle("Wygrałeś!")
-        builder.setMessage("Udało ci się za "+steps.toString()+" podejściem")
-
-        builder.setPositiveButton("Super") { dialog, which ->
-            Toast.makeText(applicationContext, "Wyslosowałeś nową liczbę", Toast.LENGTH_SHORT).show()
-        }
-        val dialog: AlertDialog = builder.create()
-        dialog.show()
-    }
 
     fun setRecord(){
         if(score>record){
@@ -109,11 +110,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        getRecord()
+        Toast.makeText(applicationContext, "Click 100 times to get a special reward !!!", Toast.LENGTH_SHORT).show()
+
+        getCurrentUserIfExists()
+        doAsync {
+            if(currentLogin != "") {
+                record = remoteHelper.getUserRecord(currentLogin).toInt()
+                textView.text = record.toString()
+            }
+        }
 
         button.setOnClickListener{
             score+=1
             setRecord()
+            if(score == 100) {
+                dialogShow()
+            }
             textView4.text = score.toString()
         }
 

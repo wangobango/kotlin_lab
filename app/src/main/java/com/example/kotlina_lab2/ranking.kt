@@ -17,6 +17,7 @@ import java.net.URL
 import android.content.Intent
 import android.telecom.Call
 import android.widget.ProgressBar
+import com.example.kotlina_lab2.DB.RemoteDBHelper
 import kotlinx.android.synthetic.main.ranking.view.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
@@ -77,17 +78,18 @@ class ranking : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.ranking)
+        val helper = RemoteDBHelper(this)
         progress = findViewById(R.id.progressBar)
         listView = findViewById<ListView>(R.id.listView)
         doAsync {
-            var data = loadData()
-            var pom = data.replace("[[","").replace("]]","").split("],[")
+            var data = helper.getTopScores()
+            var pom = data.replace("[{","").replace("}]","").replace("\"","").split("},{")
             val listItems = arrayOfNulls<String>(pom.size)
             uiThread {
                 setRecordList(data)
                 for(i in 0..pom.size-1){
-                    var msg = pom[i].replace("\"","").split(",")
-                    listItems[i] = "Gracz: "+msg[1]+", z rekordem: "+msg[2]
+                    var msg = pom[i].split(",")
+                    listItems[i] = "Gracz: "+msg[0].split(":")[1]+", z rekordem: "+msg[1].split(":")[1]
                 }
                 val adapter = ArrayAdapter(this@ranking ,android.R.layout.simple_list_item_1, listItems)
                 this@ranking.listView.adapter = adapter
